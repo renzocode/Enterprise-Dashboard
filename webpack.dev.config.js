@@ -5,12 +5,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 	entry : {
-		main : './src/index.js',
+		main : './src/bundle/index.js',
+    create :'./src/bundle/crud/bundle-create.js',
 	},
 	output : {
-		path : path.join(__dirname, 'dist'),
+		path : path.join(__dirname, 'public'),
 		publicPath : '/',
-		filename : '[name].js'
+		filename : 'apps/[name]/build/bundle.js'
 	},
 	target : 'web',
 	devtool : '#source-map',
@@ -38,14 +39,29 @@ module.exports = {
 			{
 				test : /\.(png|svg|jpg|gif)$/,
 				use : ['file-loader']
-			}
+			},
+			 {
+          		test: /\.(eot|woff2?|svg|ttf)([\?]?.*)$/,
+          		use: ['file-loader', 'url-loader']
+        	}
 		]
 	},
 	plugins : [
 		new HtmlWebpackPlugin({
 			template : "./src/html/index.html",
 			filename: "./index.html",
-			excludeChunks : ['server']
+      //inject : 'true',
+      //chunks : ['index'],
+      //chunksSortMode : 'dependency',
+      excludeChunks : ['server']
+		}),
+		new HtmlWebpackPlugin({
+			template : "./src/html/create.html",
+      inject : 'false',
+      chunks : ['create'],
+      //chunksSortMode : 'dependency',
+      filename : "./pages/create.html"
+			//excludeChunks : ['server']
 		})
 	]
 

@@ -2,141 +2,70 @@ const path = require('path');
 const debug = require('debug')(':server');
 const express = require('express');
 const http = require('http');
+const createError = require('http-errors');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+
+var indexRouter = require('../routes/index');
+
+
+var cors =  require('cors');
+var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
+
+var config = require('../config/DB');
+var bodyParser = require('body-parser');
+
+
+mongoose.Promise = global.Promise;
+mongoose.connect(config.DB).then(
+  () => { console.log('Database is connected') },
+  err => { console.log('Can not connect to the Database' +  err) }
+);
+
+var db = mongoose.connection;
+db.on('Error ', console.error.bind(console, 'MongoDB connection error: '));
 
 const app = express();
-const DIST_DIR = __dirname;
-const HTML_FILE = path.join(DIST_DIR, 'index.html');
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({extended : false}));
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use('/', express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../public')));
+
+app.use('/api', indexRouter);
+
+
+app.use(function(req, res, next){
+  next(createError(404));
+});
+
+app.use(function(err, req, res, next){
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.status(err.status || 500);
+  res.render('error');
+});
+/*const DIST_DIR = __dirname;
+const HTML_FILE = path.join(DIST_DIR, '../public');
 
 
 
-
-app.use(express.static(DIST_DIR));
+console.log("dist_dir "+ DIST_DIR);
+//app.use(express.static(DIST_DIR));
+app.use(express.static(HTML_FILE));
 app.get('*', (req, res) => {
 	res.sendFile(HTML_FILE);
 });
-
-
-
-
-///publisher garage
-/*
-var mqtt = require('mqtt');
-var client = mqtt.connect('mqtt:152.44.44.141', 1883);
-
-var state = 'closed';
-client.on('connect', ()=>{
-
-  client.subscribe('garage/open');
-  client.subscribe('garage/close');
-
-  client.publish('garage/connected', 'true');
-  sendStateUpdate();
-});
-
-client.on('messages', (topic, message)=>{
-  console.log('received message %s %s ', topic, message);
-
-  switch(topic){
-    case 'garage/open':
-      return handleOpenRequest(message);
-    case 'garage/close':
-      return handleCloseRequest(message);
-  }
-});
-
-function sendStateUpdate() {
-  console.log('---  sending state %s', state);
-  client.publish('garage/state', state);
-}
-
-function handleOpenRequest(messsage){
-  if(state !== 'open' && state !== 'opening'){
-    console.log('opening garage door');
-    state = 'opening';
-    sendStateUpdate();
-
-    setTimeout(()=>{
-      state = 'open';
-      sendStateUpdate();
-    }, 5000);
-  }
-}
-
-function  handleCloseRequest(message){
-  if(state !== 'closed' && state !== 'closing'){
-    state = 'closing';
-    sendStateUpdate();
-
-    setTimeout(()=>{
-      state = 'closed';
-      sendStateUpdate();
-
-    }, 5000);
-  }
-}
-
-
-///subscribed contrtoller
-var mqtt1 = require('mqtt');
-var client1 = mqtt1.connect('mqtt:152.44.44.141', 1883);
-
-var garageState = '';
-var connected = false;
-
-client1.on('connect', ()=>{
-  client1.subscribe('garage/connected');
-  client1.subscribe('garage/state');
-});
-
-client1.on('messages', (topic, message)=>{
-
-  switch(topic){
-    case 'garage/connected':
-      return handleGarageConnected(message);
-    case 'garage/state':
-      return handleGarageState(message);
-  }
-  console.log('No handler for topic %s', topic);
-});
-
-
-function handleGarageConnected(message){
-  console.log('garage connected status %s', message);
-  connected = (message.toString() ===  'true');
-}
-
-
-function handleGarageState(message){
-  garageState = message;
-  console.log('garage state update to %s', message);
-}
-
-function openGarageDoor(){
-  console.log(connected + ' --- ' + garageState);
-  if(connected && garageState !== 'open'){
-    client1.publish('garage/open', 'true');
-  }
-}
-
-function closeGarageDoor(){
-  console.log(connected + ' --- ' + garageState);
-  if(connected && garageState !== 'closed'){
-    client1.publish('garage/close', 'true');
-  }
-}
-
-setTimeout(()=>{
-  console.log('open door');
-  openGarageDoor();
-}, 5000);
-
-setTimeout(()=>{
-  console.log('close door');
-  closeGarageDoor();
-},2000);
-
-
 */
+
+
+
+
 
 var port  = normalizePort(process.env.PORT || '8080');
 app.set('port', port);
@@ -152,7 +81,6 @@ server.listen(port, ()=>{
 	server.on('listening', onListening);
 
 });
-
 
 function normalizePort(val){
 	var port = parseInt(val , 10);
@@ -198,32 +126,3 @@ function onListening() {
 }
 
 
-/*
-
-process.env.NTBA_FIX_319 = 1;
-
-const TelegramBot = require('node-telegram-bot-api');
-
-const token = '801059544:AAFgnW1PaCnn2ZuKcl3NUvKIousJg1VEXXg';
-
-
-const bot = new TelegramBot(token, {polling : true});
-
-
-bot.onText(/\/echo (.+)/,(msg, match)=>{
-  const chatId = msg.chat.id;
-  match[1] = "siiii.... erick se la come doblada y con nudos. xd una golosa xd";
-  const resp = match[1];
-  console.log("now bot is responding.....");
-  console.log(typeof match[1]);
-  bot.sendMessage(chatId, resp);
-});
-
-bot.on('message', (msg)=>{
-  const chatId = msg.chat.id;
-  setTimeout(()=>{
-      bot.sendMessage(chatId, 'ask me');
-  },1000);
-});
-
-*/

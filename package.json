@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "buildDev": "rm -rf dist && webpack --mode development --config webpack.server.config.js && webpack --mode development --config webpack.dev.config.js",
-    "buildProd": "rm -rf dist && webpack --mode production --config webpack.server.config.js && webpack --mode production --config webpack.prod.config.js",
-    "start": "node ./dist/server.js",
+    "buildDev": "rm -rf public && webpack --mode development --config webpack.server.config.js && webpack --mode development --config webpack.dev.config.js",
+    "buildProd": "rm -rf public && webpack --mode production --config webpack.server.config.js && webpack --mode production --config webpack.prod.config.js",
+    "start": "nodemon ./server/server.js localhost 8080",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,11 +15,21 @@
   "dependencies": {
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+    "bluebird": "^3.5.4",
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.3.1",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
-    "johnny-five": "^1.0.0",
-    "mqtt": "^2.18.8",
+    "http-errors": "^1.7.2",
+    "jquery": "^3.4.0",
+    "mongoose": "^5.5.6",
+    "morgan": "^1.9.1",
     "node-telegram-bot-api": "^0.30.0",
-    "serialport": "^7.1.4"
+    "nodemon": "^1.19.0",
+    "popper.js": "^1.15.0",
+    "serialport": "^7.1.4",
+    "url-loader": "^1.1.2"
   },
   "devDependencies": {
     "babel-loader": "^8.0.5",
