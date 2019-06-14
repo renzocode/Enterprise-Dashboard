@@ -1,5 +1,5 @@
 # e-commerce
 
 #1 download 
-#2 npm install "it's important for us because we need install some dependences"
-#3 npm start "begin our server"
+#2 npm install "also is important for us install some dependences"
+#3 npm start "run our server"
