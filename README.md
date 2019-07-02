@@ -1,5 +1,2 @@
 <h2>Enterprise Dashboard</h2>
-
-#1 download 
-#2 npm install "also is important for us install some dependences"
-#3 npm start "run our server"
+<p>Enterprise dashboard is a open source embedded system,it is made in nodejs platform, spa arquitecture, s7 protocol and azure sdk for node</p>
